@@ -22,6 +22,12 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
+    print("[*] Committing...")
+    os.system('git config --global user.name "github-actions[bot]"')
+    os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
+    os.system('git add .')
+    os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
+    os.system("git push origin HEAD:main")
 
 
 def generate_credentials():
