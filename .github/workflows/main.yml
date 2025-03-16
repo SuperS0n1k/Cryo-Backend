@@ -8,7 +8,7 @@ jobs:
     runs-on: macos-14
     steps:
       
-      - name: checkout repo content
+      - name: Checkout Repo Content
         uses: actions/checkout@v2 # checkout the repository content
 
       - name: Dependency Setup
@@ -21,6 +21,6 @@ jobs:
           brew install ngrok
           
       - name: Run Server # run main.py
-      - env:
+        env:
           NGROK_KEY: ${{ secrets.NGROK_KEY }}
         run: python main.py
