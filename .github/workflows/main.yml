@@ -1,0 +1,26 @@
+name: Run Server
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content
+
+      - name: Dependency Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' # install the python version needed
+
+      - name: Install Dependencies
+        run: |
+          brew install ngrok
+          
+      - name: Run Server # run main.py
+      - env:
+          NGROK_KEY: ${{ secrets.NGROK_KEY }}
+        run: python main.py
