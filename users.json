@@ -1,3 +1,8 @@
 {
-    "users": {}
+    "users": {
+        "fe9c9010cf4d3dfc1ef0cc270fd762f1": {
+            "password": "600156105cbdcc8e425d1525422b999f",
+            "balance": 0
+        }
+    }
 }
