@@ -34,5 +34,5 @@ jobs:
           git commit -m "Automated commit after running server" || echo "No changes to commit" # Commit the changes, only if there are changes
           git push origin HEAD:main # Push the changes to the main branch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for authentication
+          GITHUB_TOKEN: ${{ secrets.TOKEN }} # GitHub token for authentication
 
