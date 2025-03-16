@@ -26,5 +26,12 @@ jobs:
           NGROK_KEY: ${{ secrets.NGROK_KEY }}
           GITHUB_TOKEN: ${{ secrets.TOKEN }} # GitHub token for authentication
         run: |
+          # Set up trap to catch cancellation and commit changes
+          trap 'git config --global user.name "github-actions[bot]" && \
+                git config --global user.email "github-actions[bot]@users.noreply.github.com" && \
+                git add . && \
+                git commit -m "Automated commit after workflow cancellation" || echo "No changes to commit" && \
+                git push origin HEAD:main' EXIT
+
           ngrok config add-authtoken $NGROK_KEY
           python main.py
