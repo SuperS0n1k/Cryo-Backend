@@ -20,12 +20,14 @@ jobs:
         run: |
           brew install ngrok
           pip install flask
+
       - name: Run Server # run main.py
         env:
           NGROK_KEY: ${{ secrets.NGROK_KEY }}
         run: |
           ngrok config add-authtoken $NGROK_KEY
           python main.py
+
       - name: Stage, Commit, and Push Changes
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }} # GitHub token for authentication
@@ -35,4 +37,3 @@ jobs:
           git add . # Stage all changed files
           git commit -m "Automated commit after running server" || echo "No changes to commit" # Commit the changes, only if there are changes
           git push origin HEAD:main # Push the changes to the main branch
-
