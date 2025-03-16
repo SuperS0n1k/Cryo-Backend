@@ -81,3 +81,9 @@ def run_site():
 if __name__ == "__main__":
   t1 = threading.Thread(target=run_tunnel)
   t2 = threading.Thread(target=run_site)
+
+  t1.start()
+  t2.start()
+
+  t1.join()
+  t2.join()
