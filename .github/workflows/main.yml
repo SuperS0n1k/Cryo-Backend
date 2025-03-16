@@ -25,5 +25,4 @@ jobs:
           NGROK_KEY: ${{ secrets.NGROK_KEY }}
         run: |
           ngrok config add-authtoken $NGROK_KEY
-          ngrok http --url=poodle-relevant-alien.ngrok-free.app 80
           python main.py
