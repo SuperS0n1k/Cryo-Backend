@@ -1,8 +1,11 @@
-import json
 import os
+import json
 import secrets
-from flask import Flask, jsonify, request
 import threading
+import hmac
+from hashlib import sha256
+from flask import Flask, jsonify, request
+
 
 app = Flask(__name__)
 
@@ -25,7 +28,7 @@ def save_data(data):
 
 
 def generate_credentials():
-    return secrets.token_hex(16).encode('utf-8').decode('utf-8')
+    return secrets.token_hex(16)
 
 
 @app.route("/create", methods=["POST"])
@@ -34,7 +37,7 @@ def create_account():
     address = generate_credentials()
     private_key = generate_credentials()
     if address not in data["users"]:
-        data["users"][address] = {"password": private_key, "balance": 0}
+        data["users"][address] = {"password": sha256(private_key.encode('utf-8')).hexdigest(), "balance": 0}
         save_data(data)
         return jsonify({"address": address, "private_key": private_key})
     else:
@@ -54,13 +57,20 @@ def send():
     sender = request.json.get("sender")
     recipient = request.json.get("recipient")
     amount = request.json.get("amount")
-    if not sender or not recipient or amount is None:
+    private_key = request.json.get("private_key")
+
+    if not sender or not recipient or amount is None or not private_key:
         return jsonify({"error": "Missing or invalid parameters"}), 400
 
     data = load_data()
 
     if sender not in data["users"] or recipient not in data["users"]:
         return jsonify({"error": "Sender or recipient not found"}), 404
+
+    # Verify the private key
+    hashed_key = sha256(private_key.encode('utf-8')).hexdigest()
+    if hashed_key != data["users"][sender]["password"]:
+        return jsonify({"error": "Invalid private key"}), 401
 
     if data["users"][sender]["balance"] < amount:
         return jsonify({"error": "Insufficient funds"}), 400
@@ -72,19 +82,22 @@ def send():
     save_data(data)
     return jsonify({"message": f"Transfer Successful."})
 
+
 def run_tunnel():
     os.system("ngrok http --url=poodle-relevant-alien.ngrok-free.app 80")
 
+
 def run_site():
-  print("Deployment Succeeded.")
-  app.run(host="0.0.0.0", port=80)
+    print("Deployment Succeeded.")
+    app.run(host="0.0.0.0", port=80)
+
 
 if __name__ == "__main__":
-  t1 = threading.Thread(target=run_tunnel)
-  t2 = threading.Thread(target=run_site)
+    t1 = threading.Thread(target=run_tunnel)
+    t2 = threading.Thread(target=run_site)
 
-  t1.start()
-  t2.start()
+    t1.start()
+    t2.start()
 
-  t1.join()
-  t2.join()
+    t1.join()
+    t2.join()
