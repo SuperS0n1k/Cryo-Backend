@@ -1,8 +1,6 @@
-import os
 import json
-import base64
+import os
 import secrets
-import threading
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -13,6 +11,7 @@ DATA_FILE = "users.json"
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
         json.dump({"users": {}}, f, indent=4)
+
 
 def load_data():
     with open(DATA_FILE, "r") as f:
@@ -25,33 +24,28 @@ def save_data(data):
 
 
 def generate_credentials():
-    return base64.urlsafe_b64encode(secrets.token_bytes(4)).decode("utf-8")
+    return secrets.token_hex(16).encode('utf-8').decode('utf-8')
+
 
 @app.route("/create", methods=["POST"])
 def create_account():
     data = load_data()
-    username = generate_credentials()
-    password = generate_credentials()
-    if username not in data["users"]:
-        data["users"][username] = {"password": password, "balance": 0}
+    address = generate_credentials()
+    private_key = generate_credentials()
+    if address not in data["users"]:
+        data["users"][address] = {"password": private_key, "balance": 0}
         save_data(data)
-        print("[*] Committing...")
-        os.system('git config --global user.name "github-actions[bot]"')
-        os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
-        os.system('git add .')
-        os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
-        os.system("git push origin HEAD:main")
-        return jsonify({"username": username, "password": password})
+        return jsonify({"address": address, "private_key": private_key})
     else:
-        return jsonify({"error": "Failed to create account"}), 500
+        return jsonify({"error": "Failed to create wallet"}), 500
 
 
-@app.route("/users/<username>", methods=["GET"])
-def user_api(username):
+@app.route("/address/<address>", methods=["GET"])
+def user_api(address):
     data = load_data()
-    if username not in data["users"]:
-        return jsonify({"error": "User not found"}), 404
-    return jsonify({"balance": data["users"][username]["balance"]})
+    if address not in data["users"]:
+        return jsonify({"error": "Address not found"}), 404
+    return jsonify({"balance": data["users"][address]["balance"]})
 
 
 @app.route("/send", methods=["POST"])
@@ -75,27 +69,8 @@ def send():
     data["users"][recipient]["balance"] += amount
 
     save_data(data)
-    print("[*] Committing...")
-    os.system('git config --global user.name "github-actions[bot]"')
-    os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
-    os.system('git add .')
-    os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
-    os.system("git push origin HEAD:main")
-    return jsonify({"message": f"Transferred {amount} Cryo from {sender} to {recipient}"})
+    return jsonify({"message": f"Transfer Successful."})
 
-def run_tunnel():
-    os.system("ngrok http --url=poodle-relevant-alien.ngrok-free.app 80")
-
-def run_site():
-  print("Deployment Succeeded.")
-  app.run(host="0.0.0.0", port=80)
 
 if __name__ == "__main__":
-  t1 = threading.Thread(target=run_tunnel)
-  t2 = threading.Thread(target=run_site)
-
-  t1.start()
-  t2.start()
-
-  t1.join()
-  t2.join()
+    app.run(host="0.0.0.0", port=80)
