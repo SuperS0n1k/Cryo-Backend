@@ -28,8 +28,3 @@ jobs:
         run: |
           ngrok config add-authtoken $NGROK_KEY
           python main.py
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add . # Stage all changed files
-          git commit -m "Automated commit after running server" || echo "No changes to commit" # Commit the changes, only if there are changes
-          git push origin HEAD:main # Push the changes to the main branch
