@@ -24,14 +24,10 @@ jobs:
       - name: Run Server # run main.py
         env:
           NGROK_KEY: ${{ secrets.NGROK_KEY }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }} # GitHub token for authentication
         run: |
           ngrok config add-authtoken $NGROK_KEY
           python main.py
-
-      - name: Stage, Commit, and Push Changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }} # GitHub token for authentication
-        run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add . # Stage all changed files
