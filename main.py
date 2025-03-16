@@ -71,6 +71,19 @@ def send():
     save_data(data)
     return jsonify({"message": f"Transfer Successful."})
 
+def run_tunnel():
+    os.system("ngrok http --url=poodle-relevant-alien.ngrok-free.app 80")
+
+def run_site():
+  print("Deployment Succeeded.")
+  app.run(host="0.0.0.0", port=80)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+  t1 = threading.Thread(target=run_tunnel)
+  t2 = threading.Thread(target=run_site)
+
+  t1.start()
+  t2.start()
+
+  t1.join()
+  t2.join()
