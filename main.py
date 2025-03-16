@@ -22,12 +22,6 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
-    print("[*] Committing...")
-    os.system('git config --global user.name "github-actions[bot]"')
-    os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
-    os.system('git add .')
-    os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
-    os.system("git push origin HEAD:main")
 
 
 def generate_credentials():
@@ -41,6 +35,12 @@ def create_account():
     if username not in data["users"]:
         data["users"][username] = {"password": password, "balance": 0}
         save_data(data)
+        print("[*] Committing...")
+        os.system('git config --global user.name "github-actions[bot]"')
+        os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
+        os.system('git add .')
+        os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
+        os.system("git push origin HEAD:main")
         return jsonify({"username": username, "password": password})
     else:
         return jsonify({"error": "Failed to create account"}), 500
@@ -75,6 +75,12 @@ def send():
     data["users"][recipient]["balance"] += amount
 
     save_data(data)
+    print("[*] Committing...")
+    os.system('git config --global user.name "github-actions[bot]"')
+    os.system('git config --global user.email "github-actions[bot]@users.noreply.github.com"')
+    os.system('git add .')
+    os.system('git commit -m "Automated commit after running server" || echo "No changes to commit"')
+    os.system("git push origin HEAD:main")
     return jsonify({"message": f"Transferred {amount} Cryo from {sender} to {recipient}"})
 
 def run_tunnel():
